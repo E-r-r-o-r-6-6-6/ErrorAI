@@ -8,11 +8,13 @@ app = Flask(__name__)
 CORS(app)
 
 def clean_response(text):
-    import re
+
     text = re.sub(r'\\(.*?)\\', r'\1', text)
     text = re.sub(r'\\(.*?)\\', r'\1', text, flags=re.DOTALL)
-    text = re.sub(r'#+\s*', '', text)
-    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
+    text = re.sub(r'\boxed|mathbb|mathrm|textbf|textit|frac|sqrt)\{(.*?)\}', r'\2', text)
+    text = re.sub(r'\\', '', text)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    
     return text.strip()
 
 @app.route('/api', methods=['POST'])
