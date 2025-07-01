@@ -13,7 +13,7 @@ def respond():
     usermessage = data.get('message', '')
     client = Client()
     response = client.chat.completions.create(
-	    model = "gpt-4o-mini"
+	    model = "gpt-4o-mini",
 	    messages = [{"role":"user","content":f"{usermessage}"}]
 	)
     reply = response.choices[0].message.content 
