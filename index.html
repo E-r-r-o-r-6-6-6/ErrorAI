@@ -1,186 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ERROR AI Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
-      --bg: #1e1e1e;
-      --card: #2e2e2e;
-      --text: #f5f5f5;
+      --bg-dark: #1e1e1e;
+      --card-dark: #2e2e2e;
+      --text-dark: #f5f5f5;
+      --bg-light: #f4f4f4;
+      --card-light: #fff;
+      --text-light: #111;
       --accent: #4fc3f7;
       --border: #444;
-    }
-
-    * {
-      box-sizing: border-box;
     }
 
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      padding: 20px;
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
     }
 
     .container {
       max-width: 700px;
-      margin: auto;
-      background-color: var(--card);
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      margin: 0 auto;
+      padding: 20px;
     }
 
-    h2, h3 {
-      text-align: center;
-      margin-top: 0;
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background-color: var(--card-dark);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      height: 36px;
+      border-radius: 50%;
+    }
+
+    .chat-box {
+      background-color: var(--card-dark);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.3);
+      margin-top: 20px;
+    }
+
+    .chat-log {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .msg {
+      margin-bottom: 16px;
+    }
+
+    .msg.user {
+      text-align: right;
+    }
+
+    .msg .bubble {
+      display: inline-block;
+      padding: 12px;
+      border-radius: 10px;
+      background-color: #007bff;
+      color: white;
+      max-width: 85%;
+    }
+
+    .msg.bot .bubble {
+      background-color: #333;
+      color: white;
+      position: relative;
+    }
+
+    .bubble pre {
+      margin: 0;
+    }
+
+    .msg.bot .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 14px;
+      background: #444;
+      color: white;
+      border: none;
+      padding: 2px 6px;
+      border-radius: 5px;
+      cursor: pointer;
     }
 
     input[type="text"] {
       width: 100%;
       padding: 14px;
       font-size: 16px;
-      border: 1px solid var(--border);
+      border: none;
       border-radius: 8px;
+      margin-bottom: 10px;
       background-color: #333;
       color: white;
-      margin-bottom: 10px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     button {
-      width: 100%;
+      flex: 1;
       padding: 14px;
       background-color: var(--accent);
       color: black;
-      font-size: 16px;
       font-weight: bold;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: 0.3s;
     }
 
     button:hover {
       background-color: #03a9f4;
     }
 
-    #micBtn {
-      width: 100%;
-      margin-top: 10px;
-      background-color: #66bb6a;
+    .toggle-theme {
+      cursor: pointer;
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #666;
     }
 
-    #response {
-      margin-top: 20px;
-      padding: 15px;
-      background: #111;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      white-space: pre-wrap;
-      min-height: 100px;
-      font-family: Consolas, monospace;
+    .light {
+      background-color: var(--bg-light);
+      color: var(--text-light);
     }
 
-    @media (max-width: 768px) {
-      body {
-        padding: 10px;
-      }
+    .light .chat-box {
+      background-color: var(--card-light);
+    }
 
-      .container {
-        padding: 15px;
-      }
+    .light input[type="text"] {
+      background-color: #eee;
+      color: #000;
+    }
+
+    .light .msg.bot .bubble {
+      background-color: #e6e6e6;
+      color: #111;
+    }
+
+    .light .msg.user .bubble {
+      background-color: #4fc3f7;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>🤖 ERROR AI Chat</h2>
-    <h3>This is a prototype. First response may take a moment ⏳</h3>
 
-    <input type="text" id="userInput" placeholder="Type your message here...">
-    <button onclick="sendToAPI()">Send</button>
-    <button id="micBtn" onclick="startVoiceInput()">🎤 Speak</button>
-
-    <div id="response"></div>
+<div class="header">
+  <div class="logo">
+    <img src="https://via.placeholder.com/36" alt="Logo">
+    <h3>ERROR AI Chat</h3>
   </div>
+  <button class="toggle-theme" onclick="toggleTheme()">🌗 Toggle Theme</button>
+</div>
 
-  <script>
-    async function sendToAPI() {
-      const userText = document.getElementById("userInput").value.trim();
-      const responseBox = document.getElementById("response");
+<div class="container">
+  <div class="chat-box">
+    <div class="chat-log" id="chatLog"></div>
 
-      if (!userText) {
-        responseBox.innerHTML = "⚠️ Please type something.";
-        return;
-      }
+    <input type="text" id="userInput" placeholder="Type your message..." />
+    <div class="buttons">
+      <button onclick="sendToAPI()">Send</button>
+      <button onclick="startVoiceInput()">🎤 Speak</button>
+    </div>
+  </div>
+</div>
 
-      responseBox.innerHTML = "⌛ Generating response...";
+<script>
+  const chatLog = document.getElementById("chatLog");
 
-      try {
-        const res = await fetch("https://errorai666.onrender.com/api", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ message: userText })
-        });
+  function appendMessage(role, content) {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `msg ${role}`;
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
 
-        const data = await res.json();
-        typeEffect(data.reply || "No reply received.");
-      } catch (error) {
-        responseBox.innerHTML = "❌ Error: " + error.message;
-      }
+    if (role === "bot") {
+      bubble.innerHTML = marked.parse(content);
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "copy-btn";
+      copyBtn.textContent = "Copy";
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(bubble.innerText);
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => copyBtn.textContent = "Copy", 1000);
+      };
+      bubble.appendChild(copyBtn);
+    } else {
+      bubble.textContent = content;
     }
 
-    function typeEffect(text) {
-      const responseBox = document.getElementById("response");
-      responseBox.innerHTML = "";
-      let i = 0;
-      const speed = 20;
+    msgDiv.appendChild(bubble);
+    chatLog.appendChild(msgDiv);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
 
-      function typeChar() {
-        if (i < text.length) {
-          responseBox.innerHTML += text.charAt(i);
-          i++;
-          setTimeout(typeChar, speed);
-        }
-      }
+  async function sendToAPI() {
+    const userInput = document.getElementById("userInput");
+    const message = userInput.value.trim();
+    if (!message) return;
 
-      typeChar();
+    appendMessage("user", message);
+    userInput.value = "";
+
+    appendMessage("bot", "⏳ Generating...");
+
+    try {
+      const res = await fetch("https://errorai666.onrender.com/api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+      const data = await res.json();
+      chatLog.lastChild.remove(); // remove loading message
+      appendMessage("bot", data.reply || "No reply received.");
+    } catch (err) {
+      chatLog.lastChild.remove();
+      appendMessage("bot", "❌ Error: " + err.message);
+    }
+  }
+
+  function startVoiceInput() {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert("Your browser doesn't support voice recognition.");
+      return;
     }
 
-    function startVoiceInput() {
-      if (!('webkitSpeechRecognition' in window)) {
-        alert("Speech recognition not supported on this browser.");
-        return;
-      }
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-      const recognition = new webkitSpeechRecognition();
-      recognition.lang = "en-US";
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+    recognition.onstart = () => {
+      document.getElementById("userInput").placeholder = "🎙️ Listening...";
+    };
 
-      recognition.onstart = () => {
-        document.getElementById("userInput").placeholder = "🎙️ Listening...";
-      };
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById("userInput").value = transcript;
+      sendToAPI();
+    };
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById("userInput").value = transcript;
-        document.getElementById("userInput").placeholder = "Type your message here...";
-        sendToAPI();
-      };
+    recognition.onerror = (e) => {
+      alert("Speech error: " + e.error);
+    };
 
-      recognition.onerror = (e) => {
-        alert("Speech Error: " + e.error);
-      };
+    recognition.start();
+  }
 
-      recognition.start();
-    }
-  </script>
+  function toggleTheme() {
+    document.body.classList.toggle("light");
+  }
+</script>
+
 </body>
 </html>
