@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: errorai-backend
+    runtime: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
