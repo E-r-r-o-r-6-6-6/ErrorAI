@@ -2,90 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ERROR Calculator</title>
+  <title>API Chat</title>
   <style>
-    body {
-      background: #121212;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .calculator {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px #000;
-    }
-    input, select, button {
-      padding: 10px;
-      margin: 10px 0;
-      width: 100%;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-    button {
-      background: #03a9f4;
-      color: #fff;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0288d1;
-    }
-    .result {
-      margin-top: 15px;
-      font-size: 1.2rem;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
+    input, button, textarea { font-size: 16px; }
+    #response { margin-top: 20px; padding: 10px; background: white; border: 1px solid #ccc; min-height: 100px; }
   </style>
 </head>
 <body>
-  <div class="calculator">
-    <h2>ERROR's Calculator</h2>
-    <input type="number" id="num1" placeholder="Enter first number">
-    <input type="number" id="num2" placeholder="Enter second number">
-    <select id="operator">
-      <option value="+">Addition (+)</option>
-      <option value="-">Subtraction (-)</option>
-      <option value="*">Multiplication (×)</option>
-      <option value="/">Division (÷)</option>
-    </select>
-    <button onclick="calculate()">Calculate</button>
-    <div class="result" id="result">Result: </div>
-  </div>
+  <h2>Ask Something</h2>
+  
+  <input type="text" id="userInput" placeholder="Type your message..." style="width: 70%;">
+  <button onclick="sendToAPI()">Send</button>
+
+  <div id="response"></div>
 
   <script>
-    function calculate() {
-      const num1 = parseFloat(document.getElementById('num1').value);
-      const num2 = parseFloat(document.getElementById('num2').value);
-      const operator = document.getElementById('operator').value;
-      let result;
+    async function sendToAPI() {
+      const userText = document.getElementById("userInput").value;
+      const responseBox = document.getElementById("response");
+      
+      responseBox.innerHTML = "Loading...";
 
-      if (isNaN(num1) || isNaN(num2)) {
-        result = "Please enter valid numbers.";
-      } else {
-        switch (operator) {
-          case '+':
-            result = num1 + num2;
-            break;
-          case '-':
-            result = num1 - num2;
-            break;
-          case '*':
-            result = num1 * num2;
-            break;
-          case '/':
-            result = num2 !== 0 ? (num1 / num2) : "Cannot divide by zero";
-            break;
-          default:
-            result = "Invalid operator";
-        }
+      try {
+        const res = await fetch("https://your-api-url.com/endpoint", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: userText })
+        });
+
+        const data = await res.json();
+        responseBox.innerHTML = data.reply || "No reply received.";
+      } catch (error) {
+        responseBox.innerHTML = "Error: " + error.message;
       }
-
-      document.getElementById('result').textContent = "Result: " + result;
     }
   </script>
 </body>
