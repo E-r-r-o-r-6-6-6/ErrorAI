@@ -4,15 +4,28 @@
   <meta charset="UTF-8">
   <title>ERROR AI Chat</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
-    input, button, textarea { font-size: 16px; }
-    #response { margin-top: 20px; padding: 10px; background: white; border: 1px solid #ccc; min-height: 100px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    input, button, textarea {
+      font-size: 16px;
+    }
+    #response {
+      margin-top: 20px;
+      padding: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      min-height: 100px;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
   <h2>Ask Something</h2>
-  <h3>This website is just a prototype. NOTE : first response may take a moment </h3>
-  
+  <h3>This website is just a prototype. NOTE: First response may take a moment.</h3>
+
   <input type="text" id="userInput" placeholder="Type your message..." style="width: 70%;">
   <button onclick="sendToAPI()">Send</button>
 
@@ -22,8 +35,13 @@
     async function sendToAPI() {
       const userText = document.getElementById("userInput").value;
       const responseBox = document.getElementById("response");
-      
-      responseBox.innerHTML = "Loading... wait a moment Bhos-LED-K 😇😗";
+
+      if (!userText.trim()) {
+        responseBox.innerHTML = "Please type something!";
+        return;
+      }
+
+      responseBox.innerHTML = "Loading... wait a moment ⏳";
 
       try {
         const res = await fetch("https://errorai666.onrender.com/api", {
