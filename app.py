@@ -17,7 +17,7 @@ def respond():
 	    messages = [{"role":"user","content":f"{usermessage}"}]
 	)
     reply = response.choices[0].message.content 
-    return jsonify(reply)
+    return jsonify({"reply":reply})
 
 if __name__ == '__main__':
 	port = int(os.environ.get("PORT", 5000))
