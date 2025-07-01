@@ -10,7 +10,7 @@ CORS(app)  # Allows frontend from GitHub to access this API
 def respond():
     data = request.get_json()
     message = data.get('message', '')
-    return jsonify({'reply': f"You said: {message}"})
+    return jsonify({'reply': f"You said: {message} , but i said: nothing 🤪"})
 
 if __name__ == '__main__':
 	port = int(os.environ.get("PORT", 5000))
