@@ -245,9 +245,9 @@
 
 	if (!contentType || !contentType.includes("application/json")) {
   	const errorText = await res.text();  // HTML error message
-  	throw new Error("Server returned non-JSON:\n" + errorText.slice(0, 200));
+  	throw new Error("Server returned non-JSON:\n" + errorText);
 	}
-
+	
 	const data = await res.json();
       chatLog.lastChild.remove(); // remove loading message
       appendMessage("bot", data.reply || "No reply received.");
