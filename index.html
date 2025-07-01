@@ -3,45 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <title>ERROR AI Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
+    :root {
+      --bg: #1e1e1e;
+      --card: #2e2e2e;
+      --text: #f5f5f5;
+      --accent: #4fc3f7;
+      --border: #444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       padding: 20px;
-      background-color: #f4f4f4;
     }
-    input, button, textarea {
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background-color: var(--card);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    }
+
+    h2, h3 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
       font-size: 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background-color: #333;
+      color: white;
+      margin-bottom: 10px;
     }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--accent);
+      color: black;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #03a9f4;
+    }
+
+    #micBtn {
+      width: 100%;
+      margin-top: 10px;
+      background-color: #66bb6a;
+    }
+
     #response {
       margin-top: 20px;
-      padding: 10px;
-      background: white;
-      border: 1px solid #ccc;
-      min-height: 100px;
+      padding: 15px;
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       white-space: pre-wrap;
+      min-height: 100px;
+      font-family: Consolas, monospace;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Ask Something</h2>
-  <h3>This website is just a prototype. NOTE: First response may take a moment.</h3>
+  <div class="container">
+    <h2>🤖 ERROR AI Chat</h2>
+    <h3>This is a prototype. First response may take a moment ⏳</h3>
 
-  <input type="text" id="userInput" placeholder="Type your message..." style="width: 70%;">
-  <button onclick="sendToAPI()">Send</button>
+    <input type="text" id="userInput" placeholder="Type your message here...">
+    <button onclick="sendToAPI()">Send</button>
+    <button id="micBtn" onclick="startVoiceInput()">🎤 Speak</button>
 
-  <div id="response"></div>
+    <div id="response"></div>
+  </div>
 
   <script>
     async function sendToAPI() {
-      const userText = document.getElementById("userInput").value;
+      const userText = document.getElementById("userInput").value.trim();
       const responseBox = document.getElementById("response");
 
-      if (!userText.trim()) {
-        responseBox.innerHTML = "Please type something!";
+      if (!userText) {
+        responseBox.innerHTML = "⚠️ Please type something.";
         return;
       }
 
-      responseBox.innerHTML = "Loading... wait a moment ⏳";
+      responseBox.innerHTML = "⌛ Generating response...";
 
       try {
         const res = await fetch("https://errorai666.onrender.com/api", {
@@ -53,10 +130,56 @@
         });
 
         const data = await res.json();
-        responseBox.innerHTML = data.reply || "No reply received.";
+        typeEffect(data.reply || "No reply received.");
       } catch (error) {
-        responseBox.innerHTML = "Error: " + error.message;
+        responseBox.innerHTML = "❌ Error: " + error.message;
       }
+    }
+
+    function typeEffect(text) {
+      const responseBox = document.getElementById("response");
+      responseBox.innerHTML = "";
+      let i = 0;
+      const speed = 20;
+
+      function typeChar() {
+        if (i < text.length) {
+          responseBox.innerHTML += text.charAt(i);
+          i++;
+          setTimeout(typeChar, speed);
+        }
+      }
+
+      typeChar();
+    }
+
+    function startVoiceInput() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Speech recognition not supported on this browser.");
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        document.getElementById("userInput").placeholder = "🎙️ Listening...";
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("userInput").value = transcript;
+        document.getElementById("userInput").placeholder = "Type your message here...";
+        sendToAPI();
+      };
+
+      recognition.onerror = (e) => {
+        alert("Speech Error: " + e.error);
+      };
+
+      recognition.start();
     }
   </script>
 </body>
