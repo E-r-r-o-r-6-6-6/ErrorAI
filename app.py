@@ -8,11 +8,11 @@ app = Flask(__name__)
 CORS(app)
 
 def clean_response(text):
-    # Remove LaTeX-style math and markdown headings
-    text = re.sub(r'\\.*?\\', '', text, flags=re.DOTALL) 
-    text = re.sub(r'\\.*?\\', '', text)                 
-    text = re.sub(r'#+\s*', '', text)                      
-    text = text.replace('\n\n', '\n')                 
+    import re
+    text = re.sub(r'\\(.*?)\\', r'\1', text)
+    text = re.sub(r'\\(.*?)\\', r'\1', text, flags=re.DOTALL)
+    text = re.sub(r'#+\s*', '', text)
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
     return text.strip()
 
 @app.route('/api', methods=['POST'])
